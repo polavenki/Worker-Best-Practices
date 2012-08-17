@@ -25,7 +25,7 @@ worker.onmessage = function(event) {
 	var instruction = event.data;
 	instruction = JSON.parse(instruction);
 	
-	if(instruction["cmd"]==="func_call"){ // Worker trying to talk to Native.. let me call corresponding  
+	if(instruction["cmd"]==="func_call"){ // Worker trying to talk to function in base page 
 		callFunction(instruction["scope"] , instruction["params"]);
 	} 
  				

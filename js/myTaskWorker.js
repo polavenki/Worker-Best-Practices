@@ -16,7 +16,7 @@ self.onmessage = function(event) {
 	if(instruction["cmd"]==="start"){
 		importScripts.apply(self,instruction["data"]);
 		postToParent({"cmd" : "func_call" , "scope" : ["logMessage"],"params" : ["Worker establishment done"]});
-	}else if(instruction["cmd"]==="func_call"){ // Parent thread received signal on me from native. Let me execute corresponding function 
+	}else if(instruction["cmd"]==="func_call"){ // Parent page trying to call worker function
 		try{
 			var retValue = callFunction(instruction["scope"] , instruction["params"]),
 				scope = instruction["scope"].reverse(),
