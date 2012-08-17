@@ -1,0 +1,52 @@
+<html>
+<head>
+<script>
+
+var loggerDiv;
+var postToWorker = function(worker , data){
+	worker.postMessage(JSON.stringify(data));
+};
+
+var callFunction = function(funcScope , params){
+	for(var i =funcScope.length - 1  , funcObj = self; i>=0 ; i-- ){
+		if(funcObj) funcObj = funcObj[funcScope[i]];  
+	}
+	if(typeof funcObj === "function") return funcObj.apply(this , params);
+};
+
+var logMessage = function(msg){
+	loggerDiv.innerHTML+=msg+"<br/>";
+};
+	
+var worker = new Worker("./js/myTaskWorker.js"),
+	jsFiles = ["./task1.js","./task2.js"];
+
+worker.onmessage = function(event) {
+	var instruction = event.data;
+	instruction = JSON.parse(instruction);
+	
+	if(instruction["cmd"]==="func_call"){ // Worker trying to talk to Native.. let me call corresponding  
+		callFunction(instruction["scope"] , instruction["params"]);
+	} 
+ 				
+};
+
+worker.onerror = function(e){
+	console.log("Exception in Worker : "+e.message);
+};
+
+
+var onPageLoad = function(e){
+	loggerDiv = document.getElementById("log");
+	postToWorker(worker,{"cmd" : "start" , "data" : jsFiles}); // Start the worker.
+
+	postToWorker(worker,{"cmd" : "func_call" , "scope" : ["add", "Controller","task1"],"params" : [1,2]}); // Calls function directly in worker task1.Controller.getInfo()
+	postToWorker(worker,{"cmd" : "func_call" , "scope" : ["multiply", "Controller","task2"],"params" : [3,4]}); // Calls function directly in worker task1.Controller.getInfo()
+	
+}
+</script>
+</head>
+<body onLoad="onPageLoad();">
+<div id="log"></div>
+</body>
+</html>
